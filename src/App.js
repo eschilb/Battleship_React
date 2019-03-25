@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import './style.css';
+//import './game';
 
 class App extends Component {
    render() {
@@ -21,11 +22,10 @@ class Board extends Component {
    render() {
       return (
          <div>
-            <button class="btn-lg center-block buildButton">build</button>
             <div class="gameBoard container">
-               <div class="row no-gutters colHeadings"></div>
-               <div class="row no-gutters grid"></div>
-               <div class="row no-gutters colHeadings"></div>     
+               <GridHeadings />
+               <Grid />
+               <GridHeadings />   
             </div>
          </div>
       );
@@ -62,6 +62,105 @@ class Toggles extends Component {
                </div>           
             </div>
       );
+   }
+}
+
+class GridHeadings extends Component {
+   render() {
+      return (
+         <div class="row no-gutters colHeadings">{this.renderHeadings()}</div>
+      );
+   }
+   
+   renderHeadings() {
+      // arrayto return to GridHeadings div
+      var colHeadings = [];
+      
+      // loop to build column heading cells
+      for (var i=0; i<12; i++) {
+         var headingLabel = i;
+         if (i === 0 || i === 11) {
+            headingLabel = "";
+         }
+         colHeadings.push(<div class="col-xs-1 cell">{headingLabel}</div>);
+      }
+      return colHeadings;
+   }
+}
+
+class Grid extends Component {
+   render() {
+      return (
+         <div>
+            <div class="row no-gutters grid">{this.renderGrid()}</div>
+         </div>
+      );
+   }
+
+   renderGrid() {
+      // array to return to Grid div
+      var gridRows = [];
+      
+      // loop to add cells to gridRows object
+      for (var i=0; i<10; i++) {
+         // array to hold gridCells constituting an object added to gridRows
+         var gridCells = [];
+         // add row heading at start of row
+         var headingLabel = convertNumberToLetter(i+1);
+         gridCells.push(<div class="col-xs-1 rowHeading cell">{headingLabel}</div>);
+
+         // loop to add targetting coordinate gridCells
+         for (var j=0; j<10; j++) {
+            // generate gridCell id
+            var cellId = headingLabel + (j+1);
+            gridCells.push(<div class="col-xs-1 gridCell cell" id={cellId}></div>)
+         }
+
+         // add row heading at end of row
+         gridCells.push(<div class="col-xs-1 rowHeading cell">{headingLabel}</div>);
+
+         // add gridCells object to gridRows
+         gridRows.push(gridCells);
+        } 
+      return gridRows;
+   } 
+}
+
+// function to convert number to letter for row headings and coordinate IDs
+function convertNumberToLetter(num) {
+   switch(num) {
+      case 1:
+         return 'A';
+         break;
+      case 2:
+         return 'B';
+         break;
+      case 3:
+         return 'C';
+         break;
+      case 4:
+         return 'D';
+         break;
+      case 5:
+         return 'E';
+         break;
+      case 6:
+         return 'F';
+         break;
+      case 7:
+         return 'G';
+         break;
+      case 8:
+         return 'H';
+         break;
+      case 9:
+         return 'I';
+         break;
+      case 10:
+         return 'J';
+         break;
+      default:
+         return '';
    }
 }
 
