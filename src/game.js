@@ -39,7 +39,7 @@ database.ref("Player/"+playerId).set({
 */
 
 // game logic contained in object 'battleShip'
-var battleShip = {
+export const battleShip = {
    //variables
    player: 0,
    shipsHit: [], //hits on own grid
@@ -57,14 +57,14 @@ var battleShip = {
    gameMode: "setup", // value is "setup" or "live", indicating if player is setting up board or if game has started
 
    // function to add cell coloring class to gridCell
-   highlightCell: function () {
+   highlightCell: function (element) {
       if (battleShip.currentBoard==="ships") {
          if (battleShip.gameMode==="setup") {
-            battleShip.highlightCellsByShip(this);
+            battleShip.highlightCellsByShip(element);
          }
       }
       else {
-         $(this).addClass("target");
+         element.classList.add("target");
       }
    },
 
@@ -72,18 +72,18 @@ var battleShip = {
    highlightCellsByShip: function (element) {
       // need to add highlight to other ship cells, based on what ship is selected
       // will probably need new array variable indicating cells where ship will be placed
-      $(element).addClass("cellShipOpt");
+      element.classList.add("cellShipOpt");
    },
 
    // function to remove cell coloring class to gridCell
-   removeHighlight: function () {
+   removeHighlight: function (element) {
       if (battleShip.currentBoard==="ships") {
          if (battleShip.gameMode==="setup") {
-            battleShip.removeHighlightByShip(this);
+            battleShip.removeHighlightByShip(element);
          }
       }
       else {
-         $(this).removeClass("target");
+         element.classList.remove("target");
       }
    },
 
@@ -91,7 +91,7 @@ var battleShip = {
    removeHighlightByShip: function (element) {
       // need to incorporate loop that removes class from all cells indicating where ship will be placed
       // will probably need new array variable indicating cells where ship will be placed
-      $(element).removeClass("cellShipOpt");
+      element.classList.remove("cellShipOpt");
    },
 
    // function to clear radio button selections
@@ -114,8 +114,8 @@ var battleShip = {
    },
 
    // function to switch between ships board and targets board
-   toggleBoard: function () {
-      battleShip.currentBoard = this.value;
+   toggleBoard: function (element) {
+      battleShip.currentBoard = element.value;
    },
 
    // function to place ship on board: make gridCells gray, identify gridCell IDs to populate shipsAll and ship___ arrays
