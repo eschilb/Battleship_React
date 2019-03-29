@@ -38,20 +38,32 @@ class BattleshipGame extends Component {
             <Board />
             <br />
       {/*radios to select ships and ship orientation for placement, also radios to toggle between ships board and target board*/}
-            <Toggles 
-               currentBoard={() => this.state.currentBoard}
-               boardToggleState={this.state.currentBoard}
-               boardToggleAction={this.toggleBoard}
+            <GameToggles 
+               currentBoardState={this.state.currentBoard}
+               shipOrientState={this.state.shipOrientation}
+               currentShipState={this.state.currentShip}
+               toggleAction={this.handleToggleAction}
             />   
          </div>
         
       );
    }
-   toggleBoard = (newBoardState) => {
-      console.log("new board state is: " + newBoardState);
-      this.setState({
-         currentBoard: newBoardState
-      });
+   handleToggleAction = (toggleName, toggleValue) => {
+      switch (toggleName) {
+         case "board": 
+            this.setState({currentBoard: toggleValue});
+            console.log("state.currentBoard set to " + toggleValue);
+            break;
+         case "orientation":
+            this.setState({shipOrientation: toggleValue});
+            console.log("state.shipOrientation set to " + toggleValue);
+            break;
+         case "ship":
+            this.setState({currentShip: toggleValue});
+            console.log("state.currentShip set to " + toggleValue);
+            break;
+         default: console.log("toggleBoard error: not a valid toggle name!");
+      }
    }
 }
 
@@ -70,7 +82,7 @@ class Board extends Component {
    }
 }
 
-class Toggles extends Component {
+class GameToggles extends Component {
    render() {
       return (
          <div className="container shipSelect">
@@ -78,30 +90,69 @@ class Toggles extends Component {
                <div className="col-sm-6">         
                   <form>
                      <h5><u>Board Toggle</u></h5>
-                      <BoardToggle 
+                      <Toggle
+                        name="board"
                         value="ships" 
-                        //isChecked={("ships"===this.props.boardToggleState)}
-                        toggleSelect={this.props.boardToggleAction}
+                        toggleState={this.props.currentBoardState}
+                        toggleAction={this.props.toggleAction}
                      /> ships<br />
-                     <BoardToggle 
+                     <Toggle 
+                        name="board"
                         value="targets" 
-                        //isChecked={("targets"===this.props.boardToggleState)}
-                        toggleSelect={this.props.boardToggleAction}
+                        toggleState={this.props.currentBoardState}
+                        toggleAction={this.props.toggleAction}
                      /> targets<br />
                      <br />
+
                      <h5><u>Ship Orientation</u></h5>
-                     <OrientToggle value="vertical" isChecked={true} /> vertical<br />
-                     <OrientToggle value="horizontal" /> horizontal<br />
+                     <Toggle
+                        name="orientation"
+                        value="vertical" 
+                        toggleState={this.props.shipOrientState}
+                        toggleAction={this.props.toggleAction} 
+                     /> vertical<br />
+                     <Toggle
+                        name="orientation"
+                        value="horizontal" 
+                        toggleState={this.props.shipOrientState}
+                        toggleAction={this.props.toggleAction}
+                     /> horizontal<br />
                   </form>
                </div>
+
                <div className="col-sm-6">
                   <form>
                      <h5><u>Ship Select</u></h5>
-                     <ShipToggle value="shipAir" isChecked={true} /> 5 - Aircraft Carrier<br />
-                     <ShipToggle value="shipBat" /> 4 - Battleship<br />
-                     <ShipToggle value="shipSub" /> 3 - Submarine<br />
-                     <ShipToggle value="shipDes" /> 3 - Destroyer<br />
-                     <ShipToggle value="shipPtrl" /> 2 - Patrol Boat<br />
+                     <Toggle 
+                        name="ship"
+                        value="shipAir" 
+                        toggleState={this.props.currentShipState}
+                        toggleAction={this.props.toggleAction}
+                     /> 5 - Aircraft Carrier<br />
+                     <Toggle 
+                        name="ship"
+                        value="shipBat"
+                        toggleState={this.props.currentShipState}
+                        toggleAction={this.props.toggleAction}
+                     /> 4 - Battleship<br />
+                     <Toggle 
+                        name="ship"
+                        value="shipSub" 
+                        toggleState={this.props.currentShipState} 
+                        toggleAction={this.props.toggleAction}
+                     /> 3 - Submarine<br />
+                     <Toggle 
+                        name="ship"
+                        value="shipDes" 
+                        toggleState={this.props.currentShipState} 
+                        toggleAction={this.props.toggleAction}
+                     /> 3 - Destroyer<br />
+                     <Toggle 
+                        name="ship"
+                        value="shipPtrl" 
+                        toggleState={this.props.currentShipState} 
+                        toggleAction={this.props.toggleAction}
+                     /> 2 - Patrol Boat<br />
                   </form>
                </div>
             </div>           
@@ -110,54 +161,22 @@ class Toggles extends Component {
    }
 }
 
-class BoardToggle extends Component {
+class Toggle extends Component {
    render() {
       return (
          <input 
             type="radio" 
             className="radioBtn" 
-            name="board" 
+            name={this.props.name} 
             value={this.props.value}
-            onClick={this.handleToggleSelect}
+            onClick={this.handleToggleAction}
+            checked={this.props.value===this.props.toggleState}
          />
       );
    }
-   handleToggleSelect = () => {
-
-      this.props.toggleSelect(this.props.value);
+   handleToggleAction = () => {
+      this.props.toggleAction(this.props.name, this.props.value);
    }
-}
-
-class OrientToggle extends Component {
-   render() {
-      return (
-         <input 
-            type="radio" 
-            className="radioBtn" 
-            name="orientation" 
-            value={this.props.value} 
-            checked={this.props.isChecked}
-            onClick={() => this.handleToggleSelect}
-         />
-      );
-   }
-   handleToggleSelect = () => {}
-}
-
-class ShipToggle extends Component {
-   render() {
-      return (
-         <input 
-            type="radio" 
-            className="radioBtn" 
-            name="ship" 
-            value={this.props.value} 
-            checked={this.props.isChecked}   
-            onClick={() => this.handleToggleSelect}
-         />
-      );
-   }
-   handleToggleSelect = () => {}
 }
 
 class GridHeadings extends Component {
@@ -168,18 +187,9 @@ class GridHeadings extends Component {
    }
    
    renderHeadings() {
-      // arrayto return to GridHeadings div
-      var colHeadings = [];
-      
-      // loop to build column heading cells
-      for (var i=0; i<12; i++) {
-         var headingLabel = i;
-         if (i === 0 || i === 11) {
-            headingLabel = "";
-         }
-         colHeadings.push(<div className="col-xs-1 cell">{headingLabel}</div>);
-      }
-      return colHeadings;
+      return ['', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ''].map(headingLabel => (
+        <div className="col-xs-1 cell">{headingLabel}</div>
+      ));
    }
 }
 
@@ -191,34 +201,26 @@ class Grid extends Component {
    }
 
    renderGrid() {
-      // array to return to Grid div
-      var gridRows = [];
-      
-      // loop to add cells to gridRows object
-      for (var i=0; i<10; i++) {
+      return (
+         ['A','B','C','D','E','F','G','H','I','J'].map(headingLabel => {
+            // array to hold gridCells constituting an object added to gridRows
+            var gridCells = [];
 
-         // array to hold gridCells constituting an object added to gridRows
-         var gridCells = [];
+            // add row heading at start of row
+            gridCells.push(<div className="col-xs-1 rowHeading cell">{headingLabel}</div>);
 
-         // add row heading at start of row
-         var headingLabel = battleShip.convertNumberToLetter(i+1);
-         gridCells.push(<div className="col-xs-1 rowHeading cell">{headingLabel}</div>);
-
-         // loop to add targetting coordinate gridCells
-         for (var j=0; j<10; j++) {
-            // generate gridCells with id and push GridCell component to array gridCells
-            var cellId = headingLabel + (j+1);
+            // loop to add targetting coordinate gridCells
             gridCells.push(
-               <GridCell id={cellId} />)
-         }
+               [1,2,3,4,5,6,7,8,9,10].map(num => <GridCell id={headingLabel + num} />)
+            );
 
-         // add row heading at end of row
-         gridCells.push(<div className="col-xs-1 rowHeading cell">{headingLabel}</div>);
-
-         // add gridCells object to gridRows
-         gridRows.push(gridCells);
-      } 
-      return gridRows;
+            // add row heading at end of row
+            gridCells.push(<div className="col-xs-1 rowHeading cell">{headingLabel}</div>);
+            
+            // return array of divs for each row
+            return gridCells;
+         })
+      );
    } 
 }
 
@@ -234,7 +236,5 @@ class GridCell extends Component {
       );
    }
 }
-
-
 
 export default App;
