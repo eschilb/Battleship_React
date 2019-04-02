@@ -39,21 +39,25 @@
    border: 1px solid white;
 }
 
-.cellShipOpt {
+.cellShipSelect {
    background-color: gray;
    opacity: 0.5;
 }
 
-.cellShipLive {
+.cellShip {
    background-color: gray;
 }
 
-.cellShipHit {
+.cellHit {
    background-color: red;
 }
 
-.target {
+.cellTarget {
    background-color: chartreuse;
+}
+
+.cellMissed {
+   background-color: black;
 }
 
 .shipSelect {

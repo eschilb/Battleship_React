@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import './style.css';
-import {battleShip} from './battleShip';
 
 class App extends Component {
    
@@ -15,27 +14,40 @@ class BattleshipGame extends Component {
       super(props);
       this.state = {
          player: 0,
+         shipsAlive: [], //cells of all ships not yet hit
          shipsHit: [], //hits on own grid
-         shipsAll: [],
          shipAir: [], //5
          shipBat: [], //4
          shipDes: [], //3
          shipSub: [], //3
          shipPtrl: [], //2
-         targetsHit: [], //offensive hits
-         targetsMissed: [], //offensive misses
+         targetsHit: ["B3", "B4", "B5", "B6"], //offensive hits
+         targetsMissed: ["H3", "H4", "I6"], //offensive misses
          wins: 0,
          losses: 0,
+         isGameLive: false,
          currentBoard: "ships", // value is "ships" or "targets", indicating which board is active--defense or offense
-         gameMode: "setup",
          shipOrientation: "vertical",
          currentShip: "shipAir",
+         currentShipCells: [],
+         
       };
    }
    render() {
       return (
          <div>
-            <Board />
+            <Board 
+               isGameLive={this.state.isGameLive} 
+               currentBoard={this.state.currentBoard}
+               shipOrientation={this.state.shipOrientation}
+               currentShip={this.state.currentShip}
+               currentShipCells={this.state.currentShipCells}
+               shipsAlive={this.state.shipsAlive}
+               shipsHit={this.state.shipsHit}
+               targetsHit={this.state.targetsHit}
+               targetsMissed={this.state.targetsMissed}
+               updateCurrentShipCells={this.updateCurrentShipCells}
+            />
             <br />
       {/*radios to select ships and ship orientation for placement, also radios to toggle between ships board and target board*/}
             <GameToggles 
@@ -48,22 +60,22 @@ class BattleshipGame extends Component {
         
       );
    }
-   handleToggleAction = (toggleName, toggleValue) => {
-      switch (toggleName) {
+   handleToggleAction = (element) => {
+      switch (element.props.name) {
          case "board": 
-            this.setState({currentBoard: toggleValue});
-            console.log("state.currentBoard set to " + toggleValue);
+            this.setState({currentBoard: element.props.value});
             break;
          case "orientation":
-            this.setState({shipOrientation: toggleValue});
-            console.log("state.shipOrientation set to " + toggleValue);
+            this.setState({shipOrientation: element.props.value});
             break;
          case "ship":
-            this.setState({currentShip: toggleValue});
-            console.log("state.currentShip set to " + toggleValue);
+            this.setState({currentShip: element.props.value});
             break;
          default: console.log("toggleBoard error: not a valid toggle name!");
       }
+   }
+   updateCurrentShipCells = (array) => {
+      this.setState({currentShipCells: array});
    }
 }
 
@@ -74,12 +86,35 @@ class Board extends Component {
          <div>
             <div className="gameBoard container">
                <GridHeadings />
-               <Grid />
+               <Grid 
+                  isGameLive={this.props.isGameLive} 
+                  currentBoard={this.props.currentBoard}
+                  shipOrientation={this.props.shipOrientation}
+                  currentShip={this.props.currentShip}
+                  currentShipCells={this.props.currentShipCells}
+                  shipsAlive={this.props.shipsAlive}
+                  shipsHit={this.props.shipsHit}
+                  targetsHit={this.props.targetsHit}
+                  targetsMissed={this.props.targetsMissed}
+                  updateCurrentShipCells={this.props.updateCurrentShipCells}
+               />
                <GridHeadings />   
             </div>
          </div>
       );
-   }
+   }/*
+   static defaultProps = {
+      currentShipCells: [""],
+      shipAir: [""],
+      shipBat: [""],
+      shipDes: [""],
+      shipSub: [""],
+      shipPtral: [""],
+      shipsAlive: [""],
+      shipsHit: [""],
+      targetsMissed: [""],
+      targetsHit: [""]
+   }*/
 }
 
 class GameToggles extends Component {
@@ -175,7 +210,7 @@ class Toggle extends Component {
       );
    }
    handleToggleAction = () => {
-      this.props.toggleAction(this.props.name, this.props.value);
+      this.props.toggleAction(this);
    }
 }
 
@@ -211,7 +246,22 @@ class Grid extends Component {
 
             // loop to add targetting coordinate gridCells
             gridCells.push(
-               [1,2,3,4,5,6,7,8,9,10].map(num => <GridCell id={headingLabel + num} />)
+               [1,2,3,4,5,6,7,8,9,10].map(
+                  num => 
+                     <GridCell 
+                        id={headingLabel + num}
+                        isGameLive={this.props.isGameLive} 
+                        currentBoard={this.props.currentBoard}
+                        shipOrientation={this.props.shipOrientation}
+                        currentShip={this.props.currentShip}
+                        currentShipCells={this.props.currentShipCells}
+                        shipsAlive={this.props.shipsAlive}
+                        shipsHit={this.props.shipsHit}
+                        targetsHit={this.props.targetsHit}
+                        targetsMissed={this.props.targetsMissed}
+                        updateCurrentShipCells={this.props.updateCurrentShipCells}
+                     />
+               )
             );
 
             // add row heading at end of row
@@ -225,15 +275,109 @@ class Grid extends Component {
 }
 
 class GridCell extends Component {
+   constructor(props){
+      super(props);
+      this.state = {
+         //isHovered: false,
+         classes: this.renderClasses(),
+         currentShipCells: this.props.currentShipCells
+      };
+      this.handleOnMouseOver = this.handleOnMouseOver.bind(this);
+      this.handleOnMouseOut = this.handleOnMouseOut.bind(this);
+   }
    render() {
       return (
          <div
-            className="col-xs-1 gridCell cell"
+            className={this.state.classes}
             id={this.props.id}
-            onMouseOver={() => battleShip.highlightCell(this.props.id)}
-            onMouseOut={() => battleShip.removeHighlight(this.props.id)}
+            onMouseOver={this.handleOnMouseOver}
+            onMouseOut={this.handleOnMouseOut}
+            onClick={this.handleOnClick}
          ></div>
-      );
+      );    
+   }
+
+   renderClasses = () => {     
+      if (this.props.isGameLive) {
+         return this.renderLiveClasses();
+      }
+      else {
+         return this.renderSetupClasses();
+      }
+   }
+
+   renderLiveClasses = () => {
+      if ("ships"===this.props.currentBoard) {
+         return this.renderLiveShipClasses();
+      }
+      else {
+         return this.renderLiveTargetClasses();
+      }
+      
+   }
+
+   renderLiveShipClasses = () => {
+      if (this.props.shipsAlive.includes(this.props.id)) {
+         return "col-xs-1 gridCell cell cellShip";
+      }
+      else if (this.props.shipsHit.includes(this.props.id)) {
+         return "col-xs-1 gridCell cell cellHit";
+      }
+      else {
+         return "col-xs-1 gridCell cell";
+      }
+   }
+
+   renderLiveTargetClasses = () => {
+      if (this.props.targetsMissed.includes(this.props.id)) {
+         return "col-xs-1 gridCell cell cellMissed";
+      }
+      else if (this.props.targetsHit.includes(this.props.id)) {
+         return "col-xs-1 gridCell cell cellHit";
+      }
+      else {
+         return "col-xs-1 gridCell cell";
+      }
+   }
+
+   renderSetupClasses = () => {
+      //code to calculate what cells are turned gray to represent possible ship placement
+      if (this.props.shipsAlive.includes(this.props.id)) {
+         return "col-xs-1 gridCell cell cellShip";
+      }
+      else if (this.props.currentShipCells.includes(this.props.id)) {
+         return "col-xs-1 gridCell cell cellShipSelect"
+      }
+      else {
+         return "col-xs-1 gridCell cell"
+      }
+   }
+
+   renderTargetHighlight = () => {
+      return "col-xs-1 gridCell cell cellTarget";
+   }
+
+   generateShipSelectArray = () => {
+      // function to return array of cells indicating ship placement option
+      // add a ton of functionality to update array with other cell IDs based on ship selected and orientation
+      //this.props.currentShipCells.push(this.props.id);
+   }
+
+   handleOnMouseOver = () => {
+      if ("targets"===this.props.currentBoard) {
+         this.setState({classes: this.renderTargetHighlight()});
+      }
+      else if (!this.props.isGameLive) {
+         this.generateShipSelectArray()
+         this.props.updateCurrentShipCells(this.props.currentShipCells);
+      }
+   }
+   handleOnMouseOut = () => {
+      this.setState({classes: this.renderClasses()});
+   }
+   handleOnClick = () => {
+      this.props.currentShipCells.push(this.props.id);
+      this.props.updateCurrentShipCells(this.props.currentShipCells);
    }
 }
 
