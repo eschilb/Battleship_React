@@ -39,8 +39,13 @@
    border: 1px solid white;
 }
 
-.cellShipSelect {
+.cellPlaceShip {
    background-color: gray;
+   opacity: 0.5;
+}
+
+.cellPlaceShipError{
+   background-color: red;
    opacity: 0.5;
 }
 
@@ -57,7 +62,7 @@
 }
 
 .cellMissed {
-   background-color: black;
+   background-color: white;
 }
 
 .shipSelect {
