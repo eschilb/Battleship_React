@@ -45,31 +45,31 @@ class GameToggles extends Component {
                      <Toggle 
                         name="ship"
                         value="shipAir" 
-                        toggleState={this.props.currentShipState}
+                        toggleState={this.props.placeShipState}
                         toggleAction={this.props.toggleAction}
                      /> 5 - Aircraft Carrier<br />
                      <Toggle 
                         name="ship"
                         value="shipBat"
-                        toggleState={this.props.currentShipState}
+                        toggleState={this.props.placeShipState}
                         toggleAction={this.props.toggleAction}
                      /> 4 - Battleship<br />
                      <Toggle 
                         name="ship"
                         value="shipSub" 
-                        toggleState={this.props.currentShipState} 
+                        toggleState={this.props.placeShipState} 
                         toggleAction={this.props.toggleAction}
                      /> 3 - Submarine<br />
                      <Toggle 
                         name="ship"
                         value="shipDes" 
-                        toggleState={this.props.currentShipState} 
+                        toggleState={this.props.placeShipState} 
                         toggleAction={this.props.toggleAction}
                      /> 3 - Destroyer<br />
                      <Toggle 
                         name="ship"
                         value="shipPtrl" 
-                        toggleState={this.props.currentShipState} 
+                        toggleState={this.props.placeShipState} 
                         toggleAction={this.props.toggleAction}
                      /> 2 - Patrol Boat<br />
                   </form>

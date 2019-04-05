@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Board from '../Board/Board';
 import GameToggles from '../GameToggles/GameToggles';
+import ShipPlacement from './ShipPlacement';
 
 class BattleshipGame extends Component {
    constructor(props) {
@@ -18,7 +19,7 @@ class BattleshipGame extends Component {
          targetsMissed: [], //offensive misses
          wins: 0,
          losses: 0,
-         isGameLive: true,
+         isGameLive: false,
          currentBoard: "ships", // value is "ships" or "targets", indicating which board is active--defense or offense
          shipOrientation: "vertical", // orientation of ship to be placed on board
          placeShip: "shipAir", // ship type currently selected to be placed on board
@@ -51,15 +52,16 @@ class BattleshipGame extends Component {
             <GameToggles 
                currentBoardState={this.state.currentBoard}
                shipOrientState={this.state.shipOrientation}
-               currentShipState={this.state.currentShip}
+               placeShipState={this.state.placeShip}
                toggleAction={this.handleToggleAction}
             />   
          </div>
         
       );
    }
+   
+   // function to update states based on GameToggles selection
    handleToggleAction = (element) => {
-      this.updatePlaceShipCells([]);
       switch (element.props.name) {
          case "board": 
             this.setState({currentBoard: element.props.value});
@@ -68,7 +70,7 @@ class BattleshipGame extends Component {
             this.setState({shipOrientation: element.props.value});
             break;
          case "ship":
-            this.setState({currentShip: element.props.value});
+            this.setState({placeShip: element.props.value});
             break;
          default: console.log("toggleBoard error: not a valid toggle name!");
       }
@@ -99,63 +101,36 @@ class BattleshipGame extends Component {
    }
    handleHoverSetup = (cellId) => {
       // code for ship placement
-      // take cellId, based on ship, add cells to placeShipCells where ship would occupy if selected
-      // --> will probably need to make new functions, one for each ship to evaluate what those cells are
-      // make use of function convertNumberToLetter, convertLetterToNumber to calculate what cells to add and if they are still on the board
-      // also need to check if cells are already occupied in shipsAlive, and if so, set as placeShipCellsError
+      const shipPlacement = new ShipPlacement(this.state);
+      this.setState(shipPlacement.selectPlaceShipCells(cellId, this.state));
    }
 
+   // function to handle event when mouse cursor leaves GridCell: reset state values based on what is currently triggering render
    handleMouseLeaveEvent = () => {
-      this.setState({currentTargetCell: ""});
-   }
-
-   // method to set what cells render to indicate ship placement position
-   updatePlaceShipCells = (cellId) => {
-      let arr = [];
-      // code to figure out what cells to render as potential ship placement
-
-      this.setState({currentShipCells: arr});
+      if (this.state.currentTargetCell.length) { // isGameLive: true, currentBoard: targets -> Player choosing strike targets
+         this.setState({currentTargetCell: ""});
+      }
+      else if (this.state.placeShipCells.length) { //isGameLive: false, currentBoard: ships -> game setup
+         this.setState({placeShipCells: ""});
+      }
+      else if (this.state.placeShipCellsError.length) { // isGameLive: false, currentBoard: ships -> game setup (invalid ship positions)
+         this.setState({placeShipCellsError: ""});
+      }
    }
 
    // click methods
    handleClickEvent = (cellId) => {
 
    }
-   convertNumberToLetter =  (num) => {
-      switch(num) {
-         case 1:
-            return 'A';
-            break;
-         case 2:
-            return 'B';
-            break;
-         case 3:
-            return 'C';
-            break;
-         case 4:
-            return 'D';
-            break;
-         case 5:
-            return 'E';
-            break;
-         case 6:
-            return 'F';
-            break;
-         case 7:
-            return 'G';
-            break;
-         case 8:
-            return 'H';
-            break;
-         case 9:
-            return 'I';
-            break;
-         case 10:
-            return 'J';
-            break;
-         default:
-            return '';
-      }
+
+   // function to set states for start of game
+   startGame = () => {
+      this.setState({
+         isGameLive: true,
+         placeShip: "",
+         placeShipCells: [],
+         placeShipCellsError: []
+      });
    }
 }
 
