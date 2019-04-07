@@ -4,6 +4,7 @@ class ShipPlacement  {
       this.states = stateObject;
    }
 
+   /* HOVER EVENT functions */
    // function to set what and how cells render to indicate ship placement position
    selectPlaceShipCells = (cellId, stateObject) => {
       this.states = stateObject;
@@ -143,14 +144,56 @@ class ShipPlacement  {
       if (arr.includes("")) { // if array contains empty string value, invalid placement
          return false;
       }
-      arr.map( 
-         cellId => {
-            if (this.states.shipsAlive.includes(cellId)) { // if array shares cellIds with currently placed ships, invalid placement
-               return false;
-            }
+      for (let i=0; i<arr.length; i++) {
+         if (this.states.shipsAlive.includes(arr[i])) {
+            return false;
          }
-      );
+      }
       return true;
+   }
+
+   /* CLICK EVENT functions */
+   // functions to return states to update and update values when on click event
+   clickGridCell = (cellId) => {
+      let arr = this.generatePlaceShipCells(cellId);
+      let placementValid = this.isPlaceShipValid(arr);
+      if (!placementValid) {
+         alert("This is not a valid ship placement, ya dingus!");
+      }    
+      else {
+         return this.generateStateUpdates(arr);
+      }         
+   }
+
+   generateStateUpdates = (arr) => {
+      let shipType = this.getShipName();
+      let placeShipHere = window.confirm("Do you want to position your " + shipType + " here?");
+      let shipsAlive = this.states.shipsAlive.slice();
+      if (placeShipHere) {
+         arr.map(cellId => {
+            shipsAlive.push(cellId);
+         });   
+         let obj = JSON.parse("{\"shipsAlive\":\"\",\"" + this.states.placeShip + "\":\"\"}")
+         obj["shipsAlive"] = shipsAlive;
+         obj[this.states.placeShip] = arr;
+         return obj;
+      }
+   }
+
+   getShipName = () => {
+      switch (this.states.placeShip) {
+         case "shipAir":
+            return "Aircraft Carrier";
+         case "shipBat":
+            return "Battleship";
+         case "shipSub":
+            return "Submarine";
+         case "shipDes":
+            return "Destroyer";
+         case "shipPtrl":
+            return "Patrol Boat";
+         default: return;
+      }
    }
 }
 

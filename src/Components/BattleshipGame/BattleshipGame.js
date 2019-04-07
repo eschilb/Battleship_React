@@ -8,7 +8,7 @@ class BattleshipGame extends Component {
       super(props);
       this.state = {
          player: 0,
-         shipsAlive: [], //cells of all ships not yet hit
+         shipsAlive: ["B2", "C2", "D2"], //cells of all ships not yet hit
          shipsHit: [], //hits on own grid
          shipAir: [], //5
          shipBat: [], //4
@@ -25,7 +25,7 @@ class BattleshipGame extends Component {
          placeShip: "shipAir", // ship type currently selected to be placed on board
          placeShipCells: [], // array of cells showing where ship is to be placed
          placeShipCellsError: [], // array of cells showing where ship tries to be placed, but fails
-         currentTargetCell: "" // string of cell ID player currently hovering over when selecting target to strike
+         currentTargetCell: "", // string of cell ID player currently hovering over when selecting target to strike
       };
    }
    render() {
@@ -111,16 +111,23 @@ class BattleshipGame extends Component {
          this.setState({currentTargetCell: ""});
       }
       else if (this.state.placeShipCells.length) { //isGameLive: false, currentBoard: ships -> game setup
-         this.setState({placeShipCells: ""});
+         this.setState({placeShipCells: []});
       }
       else if (this.state.placeShipCellsError.length) { // isGameLive: false, currentBoard: ships -> game setup (invalid ship positions)
-         this.setState({placeShipCellsError: ""});
+         this.setState({placeShipCellsError: []});
       }
    }
 
    // click methods
    handleClickEvent = (cellId) => {
+      if (this.state.isGameLive) {
 
+      }
+      else {
+         const shipPlacement = new ShipPlacement(this.state);
+         let updateState = shipPlacement.clickGridCell(cellId);
+         this.setState(updateState);
+      }
    }
 
    // function to set states for start of game
