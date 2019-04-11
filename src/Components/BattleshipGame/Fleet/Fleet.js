@@ -4,7 +4,6 @@ import Ship from '../Ship/Ship';
 class Fleet {
 
    constructor() {
-      this.numInstances = 1;
       this.shipAir = {};
       this.shipBat = {};
       this.shipSub = {};
