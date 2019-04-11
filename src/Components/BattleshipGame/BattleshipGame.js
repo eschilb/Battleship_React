@@ -1,30 +1,25 @@
 import React, {Component} from 'react';
 import Board from '../Board/Board';
 import GameToggles from '../GameToggles/GameToggles';
-import ShipPlacement from './ShipPlacement';
+import ShipPlacement from './ShipPlacement/ShipPlacement';
+import Fleet from './Fleet/Fleet';
 
 class BattleshipGame extends Component {
    constructor(props) {
       super(props);
       this.state = {
          player: 0,
-         shipsAlive: ["B2", "C2", "D2"], //cells of all ships not yet hit
-         shipsHit: [], //hits on own grid
-         shipAir: [], //5
-         shipBat: [], //4
-         shipDes: [], //3
-         shipSub: [], //3
-         shipPtrl: [], //2
-         targetsHit: [], //offensive hits
-         targetsMissed: [], //offensive misses
          wins: 0,
          losses: 0,
-         isGameLive: false,
+         isGameLive: true,
          currentBoard: "ships", // value is "ships" or "targets", indicating which board is active--defense or offense
+         fleet: this.createFleet(), // object containing all ship objects
          shipOrientation: "vertical", // orientation of ship to be placed on board
          placeShip: "shipAir", // ship type currently selected to be placed on board
          placeShipCells: [], // array of cells showing where ship is to be placed
          placeShipCellsError: [], // array of cells showing where ship tries to be placed, but fails
+         targetsHit: [], //offensive hits
+         targetsMissed: [], //offensive misses
          currentTargetCell: "", // string of cell ID player currently hovering over when selecting target to strike
       };
    }
@@ -33,11 +28,10 @@ class BattleshipGame extends Component {
          <div>
             <Board
                isGameLive={this.state.isGameLive}
-               currentBoard={this.state.currentBoard}
-               shipsAlive={this.state.shipsAlive}
-               shipsHit={this.state.shipsHit}
+               fleet={this.state.fleet}
                targetsHit={this.state.targetsHit}
                targetsMissed={this.state.targetsMissed}
+               currentBoard={this.state.currentBoard}
                placeShip={this.state.placeShip}
                placeShipCells={this.state.placeShipCells}
                placeShipCellsError={this.state.placeShipCellsError}
@@ -53,56 +47,72 @@ class BattleshipGame extends Component {
                currentBoardState={this.state.currentBoard}
                shipOrientState={this.state.shipOrientation}
                placeShipState={this.state.placeShip}
-               toggleAction={this.handleToggleAction}
+               toggleBoard={this.toggleBoard}
+               toggleOrientation={this.toggleOrientation}
+               toggleShip={this.toggleShip}
+
+               // development specific
+               isGameLiveState={this.state.isGameLive}
+               toggleMode={this.toggleMode}
             />   
          </div>
         
       );
    }
-   
-   // function to update states based on GameToggles selection
-   handleToggleAction = (element) => {
-      switch (element.props.name) {
-         case "board": 
-            this.setState({currentBoard: element.props.value});
-            break;
-         case "orientation":
-            this.setState({shipOrientation: element.props.value});
-            break;
-         case "ship":
-            this.setState({placeShip: element.props.value});
-            break;
-         default: console.log("toggleBoard error: not a valid toggle name!");
+   // function to create and return a Fleet object
+   createFleet = () => {
+      let obj = new Fleet();
+      return obj;
+   }
+
+   // functions to update states based on GameToggles selection
+   toggleBoard = (board) => {
+      this.setState({currentBoard: board});
+   }
+   toggleOrientation = (orientation) => {
+      this.setState({shipOrientation: orientation});
+   }
+   toggleShip = (ship) => {
+      this.setState({placeShip: ship});
+   }
+   // function to toggle game mode -> strictly for development purposes
+   toggleMode = (mode) => {
+      if ("setup" === mode) {
+         this.setState({isGameLive: false});
       }
+      else {
+         this.setState({isGameLive: true});
+      }
+      
    }
 
    // hover methods
    handleHoverEvent = (cellId) => {
       const stateUpdate = (
          this.state.isGameLive
-         ? this.handleHoverLive(cellId)
-         : this.handleHoverSetup(cellId)
+         ? this.hoverLive(cellId)
+         : this.hoverSetup(cellId)
       );
       if (stateUpdate !== null) {
          this.setState(stateUpdate);
       }
    }
-   handleHoverLive = (cellId) => {
+   hoverLive = (cellId) => {
       if ("targets"===this.state.currentBoard) {
-         return this.handleHoverTargets(cellId);
+         return this.hoverTargets(cellId);
       }
    }
-   handleHoverTargets = (cellId) => {
+   hoverTargets = (cellId) => {
       return (
          (!this.state.targetsHit.includes(cellId) && !this.state.targetsMissed.includes(cellId))
          ? {currentTargetCell: cellId}
          : {currentTargetCell: ""}
       );
    }
-   handleHoverSetup = (cellId) => {
+   hoverSetup = (cellId) => {
       // code for ship placement
-      const shipPlacement = new ShipPlacement(this.state);
-      this.setState(shipPlacement.selectPlaceShipCells(cellId, this.state));
+      const shipPlacement = new ShipPlacement(this.state.fleet, this.state.shipOrientation, this.state.placeShip);
+      this.setState(shipPlacement.selectPlaceShipCells(cellId));
    }
 
    // function to handle event when mouse cursor leaves GridCell: reset state values based on what is currently triggering render
@@ -120,12 +130,14 @@ class BattleshipGame extends Component {
 
    // click methods
    handleClickEvent = (cellId) => {
-      if (this.state.isGameLive) {
-
+      if (this.state.isGameLive) { // handle click event when game is live: select target GridCell to strike
+          
       }
-      else {
-         const shipPlacement = new ShipPlacement(this.state);
+      else { // handle click event when setting up game: place ship on board
+         const shipPlacement = new ShipPlacement(this.state.fleet, this.state.shipOrientation, this.state.placeShip);
          let updateState = shipPlacement.clickGridCell(cellId);
+         console.log("updateState object:");
+         console.log(updateState);
          this.setState(updateState);
       }
    }

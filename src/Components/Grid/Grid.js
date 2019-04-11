@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import GridCell from '../GridCell/GridCell';
 
 class Grid extends Component {
+   
    render() {
       return (
          <div className="row no-gutters grid">{this.renderGrid()}</div>
@@ -45,7 +46,7 @@ class Grid extends Component {
       );
    }
 
-   renderClasses = (cellId) => {     
+   renderClasses = (cellId) => {
       if (this.props.isGameLive) {
          return this.renderLiveClasses(cellId);
       }
@@ -65,10 +66,10 @@ class Grid extends Component {
    }
 
    renderLiveShipClasses = (cellId) => {
-      if (this.props.shipsAlive.includes(cellId)) {
+      if (this.props.fleet.isFleetHere(cellId)) {
          return "col-xs-1 gridCell cell cellShip";
       }
-      else if (this.props.shipsHit.includes(cellId)) {
+      else if (this.props.fleet.isFleetHitHere(cellId)) {
          return "col-xs-1 gridCell cell cellHit";
       }
       else {
@@ -93,7 +94,7 @@ class Grid extends Component {
 
    renderSetupClasses = (cellId) => {
       //code to calculate what cells are turned gray to represent possible ship placement
-      if (this.props.shipsAlive.includes(cellId)) {
+      if (this.props.fleet.isFleetHere(cellId)) {
          return "col-xs-1 gridCell cell cellShip";
       }
       else if (this.props.placeShipCells.includes(cellId)) {

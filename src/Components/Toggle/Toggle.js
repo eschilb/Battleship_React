@@ -14,7 +14,7 @@ class Toggle extends Component {
       );
    }
    handleToggleAction = () => {
-      this.props.toggleAction(this);
+      this.props.toggleAction(this.props.value);
    }
 }
 

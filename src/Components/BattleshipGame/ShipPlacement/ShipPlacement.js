@@ -1,13 +1,17 @@
+import Fleet from '../Fleet/Fleet';
+import Ship from '../Ship/Ship';
+
 class ShipPlacement  {
 
-   constructor(stateObject) {
-      this.states = stateObject;
+   constructor(fleet={}, shipOrientation="", placeShip="") {
+      this.fleet = fleet; // Object of current fleet, passed by reference -> do not change directly!
+      this.shipOrientation = shipOrientation; // String of ship placement orientation, passed by value
+      this.placeShip = placeShip; // String of current ship to place, passed by value
    }
 
    /* HOVER EVENT functions */
    // function to set what and how cells render to indicate ship placement position
-   selectPlaceShipCells = (cellId, stateObject) => {
-      this.states = stateObject;
+   selectPlaceShipCells = (cellId) => {
       let arr = this.generatePlaceShipCells(cellId); // array with which to update state.placeShipCells or state.placeShipCellsError
       arr = this.validateCellIds(arr); // replace invalid cellIds with empty string
       let placementValid = this.isPlaceShipValid(arr); // boolean to determine validity of ship placement position
@@ -22,7 +26,7 @@ class ShipPlacement  {
 
    // function to select cellIds for ship placement based on ship type selected
    generatePlaceShipCells = (cellId) => {
-      switch (this.states.placeShip) {
+      switch (this.placeShip) {
          case "shipAir":
             return this.generateCellIds(cellId, 5);
          case "shipBat":
@@ -33,14 +37,14 @@ class ShipPlacement  {
          case "shipPtrl":
             return this.generateCellIds(cellId, 2);
          default:
-            console.log("Invalid placeShip " + this.states.placeShip + " or invalid cellId " + cellId );
+            console.log("Invalid placeShip " + this.placeShip + " or invalid cellId " + cellId );
       }
    }
 
    // function to select cellIds based on ship orientation
    generateCellIds = (cellId, arrSize) => {
       return (
-         ("horizontal" === this.states.shipOrientation) 
+         ("horizontal" === this.shipOrientation) 
          ? this.selectCellsHorizontal(cellId, arrSize) 
          : this.selectCellsVertical(cellId, arrSize)
       );
@@ -144,8 +148,9 @@ class ShipPlacement  {
       if (arr.includes("")) { // if array contains empty string value, invalid placement
          return false;
       }
-      for (let i=0; i<arr.length; i++) {
-         if (this.states.shipsAlive.includes(arr[i])) {
+      // function to check that ship placement isn't on top of already existing ship
+      for (let cellId of arr) {
+         if (this.fleet.isFleetHere(cellId)) {
             return false;
          }
       }
@@ -161,38 +166,32 @@ class ShipPlacement  {
          alert("This is not a valid ship placement, ya dingus!");
       }    
       else {
-         return this.generateStateUpdates(arr);
+         return this.generateStateUpdate(arr);
       }         
    }
 
-   generateStateUpdates = (arr) => {
-      let shipType = this.getShipName();
-      let placeShipHere = window.confirm("Do you want to position your " + shipType + " here?");
-      let shipsAlive = this.states.shipsAlive.slice();
-      if (placeShipHere) {
-         arr.map(cellId => {
-            shipsAlive.push(cellId);
-         });   
-         let obj = JSON.parse("{\"shipsAlive\":\"\",\"" + this.states.placeShip + "\":\"\"}")
-         obj["shipsAlive"] = shipsAlive;
-         obj[this.states.placeShip] = arr;
-         return obj;
+   generateStateUpdate = (arr) => {
+      if (this.fleet.hasShip(this.placeShip)) {// ship already exists in fleet
+         console.log("fleet already contains " + this.fleet[this.placeShip].name);
+         return {};
+      }
+      else { // generate object to update BattleshipGame state 'fleet'
+         return this.generateFleet(arr);
       }
    }
 
-   getShipName = () => {
-      switch (this.states.placeShip) {
-         case "shipAir":
-            return "Aircraft Carrier";
-         case "shipBat":
-            return "Battleship";
-         case "shipSub":
-            return "Submarine";
-         case "shipDes":
-            return "Destroyer";
-         case "shipPtrl":
-            return "Patrol Boat";
-         default: return;
+   // function to create fleet object representing new state of fleet due to ship addition
+   generateFleet = (arr) => {
+      const newShip = new Ship(this.placeShip, arr);
+      let placeShipHere = window.confirm("Do you want to position your " + newShip.name + " here?");
+      if (placeShipHere) {
+         const fleetUpdate = new Fleet();
+         fleetUpdate.copyFleetObject(this.fleet);
+         fleetUpdate.addShip(this.placeShip, newShip);
+         return {fleet: fleetUpdate};
+      }
+      else {
+         return {};
       }
    }
 }

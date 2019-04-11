@@ -12,7 +12,7 @@ class Board extends Component {
                <Grid
                   isGameLive={this.props.isGameLive}
                   currentBoard={this.props.currentBoard}
-                  shipsAlive={this.props.shipsAlive}
+                  fleet={this.props.fleet}
                   shipsHit={this.props.shipsHit}
                   targetsHit={this.props.targetsHit}
                   targetsMissed={this.props.targetsMissed}
