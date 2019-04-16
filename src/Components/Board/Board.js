@@ -22,7 +22,8 @@ class Board extends Component {
                   currentTargetCell={this.props.currentTargetCell}
                   mouseHoverAction={this.props.mouseHoverAction}
                   mouseExitAction={this.props.mouseExitAction}
-                  mouseClickAction={this.props.mouseClickAction}
+                  mouseClickLive={this.props.mouseClickLive}
+                  mouseClickSetup={this.props.mouseClickSetup}
                />
                <GridHeadings />   
             </div>

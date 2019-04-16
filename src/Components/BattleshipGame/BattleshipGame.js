@@ -39,11 +39,13 @@ class BattleshipGame extends Component {
                updatePlaceShipCells={this.updatePlaceShipCells}
                mouseHoverAction={this.handleHoverEvent}
                mouseExitAction={this.handleMouseLeaveEvent}
-               mouseClickAction={this.handleClickEvent}
+               mouseClickLive={this.handleClickEventLive}
+               mouseClickSetup={this.handleClickEventSetup}
             />
             <br />
       {/*radios to select ships and ship orientation for placement, also radios to toggle between ships board and target board*/}
-            <GameToggles 
+            <GameToggles
+               fleet={this.state.fleet}
                currentBoardState={this.state.currentBoard}
                shipOrientState={this.state.shipOrientation}
                placeShipState={this.state.placeShip}
@@ -93,7 +95,7 @@ class BattleshipGame extends Component {
          ? this.hoverLive(cellId)
          : this.hoverSetup(cellId)
       );
-      if (stateUpdate !== null) {
+      if (stateUpdate !== null && stateUpdate !== undefined) {
          this.setState(stateUpdate);
       }
    }
@@ -111,8 +113,13 @@ class BattleshipGame extends Component {
    }
    hoverSetup = (cellId) => {
       // code for ship placement
-      const shipPlacement = new ShipPlacement(this.state.fleet, this.state.shipOrientation, this.state.placeShip);
-      this.setState(shipPlacement.selectPlaceShipCells(cellId));
+      if (this.state.placeShip.length !== 0) {
+         const shipPlacement = new ShipPlacement(this.state.fleet, this.state.shipOrientation, this.state.placeShip);
+         this.setState(shipPlacement.selectPlaceShipCells(cellId));
+      }
+      else {
+         return;
+      }   
    }
 
    // function to handle event when mouse cursor leaves GridCell: reset state values based on what is currently triggering render
@@ -129,15 +136,19 @@ class BattleshipGame extends Component {
    }
 
    // click methods
-   handleClickEvent = (cellId) => {
-      if (this.state.isGameLive) { // handle click event when game is live: select target GridCell to strike
-          
+   // function to handle click event when game is live
+   handleClickEventLive = (cellId) => {
+      if (this.state.currentBoard === "targets") {
+         // select cellId as target for strike
       }
-      else { // handle click event when setting up game: place ship on board
-         const shipPlacement = new ShipPlacement(this.state.fleet, this.state.shipOrientation, this.state.placeShip);
-         let updateState = shipPlacement.clickGridCell(cellId);
-         console.log("updateState object:");
-         console.log(updateState);
+   }
+   // function to handle click event when game is in setup mode
+   handleClickEventSetup = (cellId) => {
+      const shipPlacement = new ShipPlacement(this.state.fleet, this.state.shipOrientation, this.state.placeShip);
+      let updateState = shipPlacement.clickGridCell(cellId);
+      console.log("updateState object:");
+      console.log(updateState);
+      if (updateState !== null && updateState !== undefined) {
          this.setState(updateState);
       }
    }

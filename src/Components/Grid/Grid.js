@@ -29,7 +29,7 @@ class Grid extends Component {
                            id={cellId}
                            classes={classes}
                            mouseHoverAction={this.props.mouseHoverAction}
-                           mouseClickAction={this.props.mouseClickAction}
+                           mouseClickAction={this.defineMouseClick()}
                            mouseExitAction={this.props.mouseExitAction}
                         />
                      );
@@ -106,6 +106,10 @@ class Grid extends Component {
       else {
          return "col-xs-1 gridCell cell"
       }
+   }
+
+   defineMouseClick = () => {
+      return this.props.isGameLive ? this.props.mouseClickLive : this.props.mouseClickSetup;
    }
 }
 

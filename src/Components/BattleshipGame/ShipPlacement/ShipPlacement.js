@@ -163,7 +163,7 @@ class ShipPlacement  {
       let arr = this.generatePlaceShipCells(cellId);
       let placementValid = this.isPlaceShipValid(arr);
       if (!placementValid) {
-         alert("This is not a valid ship placement, ya dingus!");
+         return;
       }    
       else {
          return this.generateStateUpdate(arr);
@@ -172,8 +172,8 @@ class ShipPlacement  {
 
    generateStateUpdate = (arr) => {
       if (this.fleet.hasShip(this.placeShip)) {// ship already exists in fleet
-         console.log("fleet already contains " + this.fleet[this.placeShip].name);
-         return {};
+         console.log("fleet already contains " + this.fleet.ships.get(this.placeShip).name);
+         return;
       }
       else { // generate object to update BattleshipGame state 'fleet'
          return this.generateFleet(arr);
@@ -185,13 +185,12 @@ class ShipPlacement  {
       const newShip = new Ship(this.placeShip, arr);
       let placeShipHere = window.confirm("Do you want to position your " + newShip.name + " here?");
       if (placeShipHere) {
-         const fleetUpdate = new Fleet();
-         fleetUpdate.copyFleetObject(this.fleet);
+         let fleetUpdate = new Fleet(this.fleet);
          fleetUpdate.addShip(this.placeShip, newShip);
-         return {fleet: fleetUpdate};
+         return {fleet: fleetUpdate, placeShip: ""}; // code to auto select placeShip
       }
       else {
-         return {};
+         return;
       }
    }
 }

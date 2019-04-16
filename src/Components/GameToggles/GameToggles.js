@@ -47,30 +47,35 @@ class GameToggles extends Component {
                         value="shipAir" 
                         toggleState={this.props.placeShipState}
                         toggleAction={this.props.toggleShip}
+                        disabled={this.isRadioDisabled("shipAir")}
                      /> 5 - Aircraft Carrier<br />
                      <Toggle 
                         name="ship"
                         value="shipBat"
                         toggleState={this.props.placeShipState}
                         toggleAction={this.props.toggleShip}
+                        disabled={this.isRadioDisabled("shipBat")}
                      /> 4 - Battleship<br />
                      <Toggle 
                         name="ship"
                         value="shipSub" 
                         toggleState={this.props.placeShipState} 
                         toggleAction={this.props.toggleShip}
+                        disabled={this.isRadioDisabled("shipSub")}
                      /> 3 - Submarine<br />
                      <Toggle 
                         name="ship"
                         value="shipDes" 
                         toggleState={this.props.placeShipState} 
                         toggleAction={this.props.toggleShip}
+                        disabled={this.isRadioDisabled("shipDes")}
                      /> 3 - Destroyer<br />
                      <Toggle 
                         name="ship"
                         value="shipPtrl" 
                         toggleState={this.props.placeShipState} 
                         toggleAction={this.props.toggleShip}
+                        disabled={this.isRadioDisabled("shipPtrl")}
                      /> 2 - Patrol Boat<br />
 
                      <h5><u>Ship Orientation</u></h5>
@@ -91,6 +96,10 @@ class GameToggles extends Component {
             </div>           
          </div>
       );
+   }
+
+   isRadioDisabled = shipType => {
+      return this.props.fleet.ships.has(shipType);
    }
 }
 
