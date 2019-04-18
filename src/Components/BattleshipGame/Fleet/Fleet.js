@@ -21,46 +21,33 @@ class Fleet {
    addShip = (shipType, shipObject) => {
       this.ships.set(shipType, shipObject);
    }
-   // // function to return copy of current fleet object
-   // copyFleetObject = (fleetMaster) => {
-   //    if (!fleetMaster instanceof Fleet) {
-   //       console.log("copyFleetObject failed: param is not instanceOf Fleet");
-   //       return {};
-   //    }
-   //    var fleet = this;
-   //    fleet.activeKeys = fleetMaster.activeKeys;
-   //    for (let key of fleet.activeKeys) {
-   //       const shipObj = new Ship();
-   //       shipObj.copyShipObject(fleetMaster[key]);
-   //       fleet[key] = shipObj;
-   //    }
-   // }
+
    // function to return boolean indicating if fleet occupies given cellId
    isFleetHere = (cellId) => {
-      let bool = false;
-      this.ships.forEach( shipObj => {
-         if (shipObj.isShipHere(cellId)) {
-            bool = true;
+      for (let shipsItem of this.ships) {
+         if (shipsItem[1].isShipHere(cellId)) {
+            return true;
          }
-      });
-      return bool;
-      // var fleet = this;
-      // for (let key of this.activeKeys) {
-      //    if (fleet[key].isShipHere(cellId)) {
-      //       return true;
-      //    }
-      // }
-      // return false;
+      }
+      return false;
+   }
+   // function to return key(placeShip) of Ship object that occupies given cellId
+   whatShipIsHere = (cellId) => {
+      for (let [shipKey,shipObj] of this.ships) {
+         if (shipObj.isShipHere(cellId)) {
+            return shipKey;
+         }
+      }
+      return "";
    }
    // function to return boolean indicating if fleet has been hit at given cellId
    isFleetHitHere = (cellId) => {
-      let bool = false;
-      this.ships.forEach( shipObj => {
-         if (shipObj.isShipHitHere(cellId)) {
-            bool = true;
+      for (let shipsItem of this.ships) {
+         if (shipsItem[1].isShipHitHere(cellId)) {
+            return true;
          }
-      });
-      return bool;
+      }
+      return false;
    }
 }
 

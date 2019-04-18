@@ -11,7 +11,7 @@ class BattleshipGame extends Component {
          player: 0,
          wins: 0,
          losses: 0,
-         isGameLive: true,
+         isGameLive: false,
          currentBoard: "ships", // value is "ships" or "targets", indicating which board is active--defense or offense
          fleet: this.createFleet(), // object containing all ship objects
          shipOrientation: "vertical", // orientation of ship to be placed on board

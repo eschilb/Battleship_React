@@ -158,40 +158,62 @@ class ShipPlacement  {
    }
 
    /* CLICK EVENT functions */
-   // functions to return states to update and update values when on click event
+   // functions to return states to update and update values based on given id of gridCell clicked
    clickGridCell = (cellId) => {
-      let arr = this.generatePlaceShipCells(cellId);
-      let placementValid = this.isPlaceShipValid(arr);
-      if (!placementValid) {
+      if (this.fleet.isFleetHere(cellId)) { // user clicked on already placed ship
+         return this.removeTargetShip(cellId);
+      }
+      else if (this.placeShip !== "") { // user is placing a new ship
+         return this.getNewState(cellId);
+      }
+      else { // user clicked on empty gridCell without selecting ship
          return;
-      }    
-      else {
-         return this.generateStateUpdate(arr);
-      }         
+      }        
    }
 
+   // function to remove clicked ship from grid and reselect it for placement
+   removeTargetShip = (cellId) => {
+      let shipKey = this.fleet.whatShipIsHere(cellId);
+      this.fleet.ships.delete(shipKey);
+      if (shipKey !== "") {
+         return {
+            fleet: this.fleet,
+            placeShip: shipKey,
+         };
+      }
+      else {
+         return;
+      }
+   }
+
+   // function to return new state update if ship placement location is valid
+   getNewState = (cellId) => {
+      let arr = this.generatePlaceShipCells(cellId);
+      if (this.isPlaceShipValid(arr)) {
+         return this.generateStateUpdate(arr);
+      }    
+      else {
+         return;
+      } 
+   }
+   // function to generate
    generateStateUpdate = (arr) => {
       if (this.fleet.hasShip(this.placeShip)) {// ship already exists in fleet
          console.log("fleet already contains " + this.fleet.ships.get(this.placeShip).name);
          return;
       }
       else { // generate object to update BattleshipGame state 'fleet'
-         return this.generateFleet(arr);
+         let fleetUpdate = this.generateFleet(arr);
+         return {fleet: fleetUpdate, placeShip: ""}; // TODO: code to auto select placeShip
       }
    }
 
-   // function to create fleet object representing new state of fleet due to ship addition
+   // function to create fleet object representing new state of fleet from ship addition
    generateFleet = (arr) => {
       const newShip = new Ship(this.placeShip, arr);
-      let placeShipHere = window.confirm("Do you want to position your " + newShip.name + " here?");
-      if (placeShipHere) {
-         let fleetUpdate = new Fleet(this.fleet);
-         fleetUpdate.addShip(this.placeShip, newShip);
-         return {fleet: fleetUpdate, placeShip: ""}; // code to auto select placeShip
-      }
-      else {
-         return;
-      }
+      let newFleet = new Fleet(this.fleet);
+      newFleet.addShip(this.placeShip, newShip);
+      return newFleet;    
    }
 }
 

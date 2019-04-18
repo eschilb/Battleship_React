@@ -1,5 +1,6 @@
 class Ship {
    constructor(placeShip="", position=[]) {
+      this.type = placeShip;
       this.name = this.findName(placeShip);
       this.position = position;
       this.hits = [];
@@ -27,18 +28,6 @@ class Ship {
    //    this.hits = hits;
    // }
 
-   // // function that returns copy of current Ship object
-   // copyShipObject = (shipMaster) => {
-   //    if (!shipMaster instanceof Ship) {
-   //       console.log("copyShipObject failed: param is not instanceOf Ship");
-   //       return {};
-   //    }
-   //    this.name = shipMaster.name;
-   //    this.position = shipMaster.position;
-   //    this.hits = shipMaster.hits;
-   //    this.isAlive = shipMaster.isAlive;
-   // }
-   // function to return name of ship by shipType({shipAir, shipBat, shipSub, shipDes, shipPtrl)
    findName = (shipType) => {
       switch (shipType) {
          case "shipAir":
@@ -54,7 +43,7 @@ class Ship {
          default: return "Invalid shipType: " + shipType;
       }
    }
-   // functiont to return boolean indicating if ship occupies given cellId
+   // function to return boolean indicating if ship occupies given cellId
    isShipHere = (cellId) => {
       if (this.position.includes(cellId)) {
          return true;
