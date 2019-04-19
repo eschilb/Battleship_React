@@ -160,7 +160,7 @@ class ShipPlacement  {
    /* CLICK EVENT functions */
    // functions to return states to update and update values based on given id of gridCell clicked
    clickGridCell = (cellId) => {
-      if (this.fleet.isFleetHere(cellId)) { // user clicked on already placed ship
+      if (this.fleet.isFleetHere(cellId) && this.placeShip === "") { // user clicked on already placed ship
          return this.removeTargetShip(cellId);
       }
       else if (this.placeShip !== "") { // user is placing a new ship
@@ -204,7 +204,7 @@ class ShipPlacement  {
       }
       else { // generate object to update BattleshipGame state 'fleet'
          let fleetUpdate = this.generateFleet(arr);
-         return {fleet: fleetUpdate, placeShip: ""}; // TODO: code to auto select placeShip
+         return {fleet: fleetUpdate, placeShip: ""};
       }
    }
 

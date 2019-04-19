@@ -78,7 +78,7 @@ class GameToggles extends Component {
                         disabled={this.isRadioDisabled("shipPtrl")}
                      /> 2 - Patrol Boat<br />
 
-                     <h5><u>Ship Orientation</u></h5>
+                     <h5><u>Ship Orientation</u><br></br>(toggle w/ spacebar)</h5>
                      <Toggle
                         name="orientation"
                         value="vertical" 

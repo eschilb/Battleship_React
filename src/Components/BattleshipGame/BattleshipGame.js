@@ -23,6 +23,14 @@ class BattleshipGame extends Component {
          currentTargetCell: "", // string of cell ID player currently hovering over when selecting target to strike
       };
    }
+   componentDidMount() {
+      document.body.addEventListener("keydown", this.onkeyupSwitchOrientation);
+   }
+
+   componentWillUnmount() {
+      document.body.removeEventListener("keydown", this.onkeyupSwitchOrientation);
+   }
+
    render() {
       return (
          <div>
@@ -86,6 +94,19 @@ class BattleshipGame extends Component {
          this.setState({isGameLive: true});
       }
       
+   }
+
+   // function to toggle orientation with spacebar, during setup
+   onkeyupSwitchOrientation = (event) => {
+      if (32 === event.keyCode) {
+         event.preventDefault(); // firefox has spacebar set to scroll -> bye, felicia
+         if ("vertical" === this.state.shipOrientation) {
+            this.setState({shipOrientation: "horizontal"});
+         }
+         else {
+            this.setState({shipOrientation: "vertical"});
+         }
+      }
    }
 
    // hover methods
