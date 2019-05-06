@@ -87,13 +87,7 @@ class BattleshipGame extends Component {
    }
    // function to toggle game mode -> strictly for development purposes
    toggleMode = (mode) => {
-      if ("setup" === mode) {
-         this.setState({isGameLive: false});
-      }
-      else {
-         this.setState({isGameLive: true});
-      }
-      
+      this.setState({isGameLive: !"setup" === mode});
    }
 
    // function to toggle orientation with spacebar, during setup
@@ -170,7 +164,19 @@ class BattleshipGame extends Component {
       console.log("updateState object:");
       console.log(updateState);
       if (updateState !== null && updateState !== undefined) {
-         this.setState(updateState);
+         this.setState(updateState, this.readyGame);
+      }
+   }
+
+   // function to ask user if they are ready to start game
+   readyGame = () => {
+      if (this.state.fleet.ships.size === 5) {
+         if (window.confirm("Is your fleet ready to battle?")) {
+            this.startGame();
+         }
+         else {
+            alert("Please ready your fleet or click 'Ready' to begin.")
+         }
       }
    }
 
